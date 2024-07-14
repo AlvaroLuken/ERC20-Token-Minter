@@ -1,12 +1,12 @@
 import React from "react";
-import { useTheme } from "next-themes";
+//import { useTheme } from "next-themes";
 import { SwitchTheme } from "~~/components/SwitchTheme";
 
 /**
  * Site footer
  */
 export const Footer = () => {
-  const { resolvedTheme } = useTheme();
+  //const { resolvedTheme } = useTheme();
 
   // const isDarkMode = resolvedTheme === "dark";
 
