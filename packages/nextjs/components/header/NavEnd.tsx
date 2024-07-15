@@ -1,47 +1,57 @@
 "use client";
 
 import React from "react";
-import { AddressInfoDropdown } from "../scaffold-eth/AddressInfoDropdown";
-import { AddressQRCodeModal } from "../scaffold-eth/AddressQRCodeModal";
 import { LOGIN_DIALOG_ID, LoginDialog } from "./LoginDialog";
-import { useSignerStatus } from "@alchemy/aa-alchemy/react";
-import { useAccount } from "@alchemy/aa-alchemy/react";
-import { useTargetNetwork } from "~~/hooks/scaffold-eth/useTargetNetwork";
-import { getBlockExplorerAddressLink } from "~~/utils/scaffold-eth";
+import { PROFILE_DIALOG_ID, ProfileDialog } from "./ProfileDialog";
+import { REGISTER_DIALOG_ID, RegisterDialog } from "./RegisterDialog";
+import { useAuth } from "~~/app/auth/AuthProvider";
 
 export const NavEnd = () => {
-  const { isConnected } = useSignerStatus();
-  const { targetNetwork } = useTargetNetwork();
-  const { account } = useAccount({ type: "MultiOwnerModularAccount" });
+  const { user } = useAuth();
 
-  const openModal = () => {
+  const openModal1 = () => {
     (document.getElementById(LOGIN_DIALOG_ID) as HTMLDialogElement).showModal();
   };
 
-  if (isConnected || account) {
-    return (
-      <div className="navbar-end flex-grow mr-4">
-        {account && (
-          <>
-            <AddressInfoDropdown
-              address={account.address}
-              blockExplorerAddressLink={getBlockExplorerAddressLink(targetNetwork, account.address)}
-            />
-            <AddressQRCodeModal address={account.address} />
-          </>
-        )}
-      </div>
-    );
-  }
+  const openModal2 = () => {
+    (document.getElementById(REGISTER_DIALOG_ID) as HTMLDialogElement).showModal();
+  };
+
+  const openModal3 = () => {
+    (document.getElementById(PROFILE_DIALOG_ID) as HTMLDialogElement).showModal();
+  };
 
   return (
     <>
-      <div className="navbar-end flex-grow mr-4">
-        <div className="btn btn-primary" onClick={openModal}>
-          Login
+      {/* {isLoading ? <Loader /> : */}
+      <div>
+        <div className="navbar-end flex-grow mr-4">
+          {!user ? (
+            <div>
+              <div className="btn btn-primary" onClick={openModal1}>
+                Login
+              </div>
+              <div className="btn btn-primary ml-2" onClick={openModal2}>
+                Register
+              </div>
+            </div>
+          ) : (
+            ""
+          )}
+
+          {user ? (
+            <div className="btn btn-primary ml-2" onClick={openModal3}>
+              {user.username}
+            </div>
+          ) : (
+            ""
+          )}
         </div>
+        <LoginDialog />
+        <RegisterDialog />
+        <ProfileDialog />
       </div>
-      <LoginDialog />
+      {/* </div>} */}
     </>
   );
 };

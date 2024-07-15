@@ -1,12 +1,12 @@
 "use client";
 
+import { useState } from "react";
 import { useAccount } from "@alchemy/aa-alchemy/react";
 import type { NextPage } from "next";
+import { formatEther, parseEther } from "viem";
+import { Address } from "viem";
 import { AddressInput, IntegerInput } from "~~/components/scaffold-eth";
 import { useScaffoldReadContract, useScaffoldWriteContract } from "~~/hooks/scaffold-eth";
-import { formatEther, parseEther } from "viem";
-import { useState } from "react";
-import { Address } from "viem";
 
 declare global {
   interface HTMLDialogElement extends HTMLElement {
@@ -43,13 +43,14 @@ const Home: NextPage = () => {
 
   return (
     <div className="flex items-center flex-col flex-grow pt-10">
-
       <div className="card bg-base-100 w-96 shadow-xl">
         <div className="stat">
           <div className="stat-title">Your Tokens</div>
           <div className="stat-value">{formatEther(balance || 0n)}</div>
           <div className="stat-actions">
-            <button className="btn btn-sm" onClick={mint}>Mint 100</button>
+            <button className="btn btn-sm" onClick={mint}>
+              Mint 100
+            </button>
           </div>
         </div>
       </div>
@@ -58,7 +59,6 @@ const Home: NextPage = () => {
           <h2 className="card-title">Transfer Tokens</h2>
 
           <label>
-            Recipient:
             <AddressInput value={recipient} onChange={val => setRecipient(val)} />
           </label>
           <label>
@@ -66,9 +66,10 @@ const Home: NextPage = () => {
             <IntegerInput value={amount} onChange={val => setAmount(val)} />
           </label>
 
-
           <div className="card-actions justify-end">
-            <button className="btn btn-primary" onClick={transfer}>Transfer</button>
+            <button className="btn btn-primary" onClick={transfer}>
+              Transfer
+            </button>
           </div>
         </div>
       </div>

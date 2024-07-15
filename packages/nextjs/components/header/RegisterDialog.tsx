@@ -3,19 +3,19 @@
 import { useState } from "react";
 import { useAuth } from "~~/app/auth/AuthProvider";
 
-export const LOGIN_DIALOG_ID = "login-dialog";
+export const REGISTER_DIALOG_ID = "register-dialog";
 
-export const LoginDialog = () => {
-  const { login } = useAuth();
+export const RegisterDialog = () => {
+  const { register } = useAuth();
   const [email, setEmail] = useState<string>("");
   const [password, setPassword] = useState<string>("");
 
   // const handleFormSubmit = (e: any) => {
-  //   e.preventDefault();
-  //   // Handle form submission logic here
-  //   console.log('Form submitted');
-  //   var closeModalButton = document.getElementById("close-the-modal");
-  //   closeModalButton?.click();
+  //     e.preventDefault();
+  //     // Handle form submission logic here
+  //     console.log('Form submitted');
+  //     var closeModalButton = document.getElementById("close-the-modal");
+  //     closeModalButton?.click();
   // };
 
   const handleEmailChange = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -27,14 +27,28 @@ export const LoginDialog = () => {
     setPassword(event.target.value);
   };
 
+  async function handleRegister() {
+    console.log("Registering...");
+    /*
+          
+        CIRCLE PROGRAMMABLE WALLET LOGIC GOES HERE
+        
+        */
+    const walletAddress = "0x";
+    const walletId = "123";
+    register(email, password, walletAddress, walletId);
+    const closeModalButton = document.getElementById("close-the-modal");
+    closeModalButton?.click();
+  }
+
   return (
-    <dialog id={LOGIN_DIALOG_ID} className="modal">
+    <dialog id={REGISTER_DIALOG_ID} className="modal">
       {/* <form onSubmit={handleFormSubmit} method="dialog"> */}
-      <div className="modal-box flex justify-center self-center z-10 mt-12">
+      <div id="modal-register" className="modal-box flex justify-center self-center z-10 mt-12">
         <div className="p-12 mx-auto rounded-2xl w-100 ">
           <div className="mb-4">
-            <h3 className="font-semibold text-2xl">Sign In </h3>
-            <p className="">Please sign in to your account.</p>
+            <h3 className="font-semibold text-2xl">Register</h3>
+            <p className="">Please register your account.</p>
           </div>
           <div className="space-y-5">
             <div className="space-y-2">
@@ -57,11 +71,11 @@ export const LoginDialog = () => {
             </div>
             <div>
               <button
-                onClick={() => login(email, password)}
+                onClick={handleRegister}
                 type="submit"
                 className="w-full flex justify-center bg-green-400  hover:bg-green-500 p-3  rounded-full tracking-wide font-semibold  shadow-lg cursor-pointer transition ease-in duration-500"
               >
-                Sign in
+                Register
               </button>
             </div>
           </div>
