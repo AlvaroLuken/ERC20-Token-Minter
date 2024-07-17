@@ -11,7 +11,6 @@ export async function POST(request: NextRequest) {
   });
 
   const ABI1 = ["function mint(address account, uint256 amount)"];
-
   const ABI2 = ["function transfer(address to, uint256 amount)"];
 
   const iface1 = new ethers.utils.Interface(ABI1);
@@ -19,7 +18,10 @@ export async function POST(request: NextRequest) {
 
   const mintCalldata = iface1.encodeFunctionData("mint", [walletAddress, ethers.utils.parseEther("100.0")]);
 
-  const transferCalldata = iface2.encodeFunctionData("transfer", [recipient, ethers.utils.parseEther(amount)]);
+  let transferCalldata;
+  if (functionName == "transfer" && amount) {
+    transferCalldata = iface2.encodeFunctionData("transfer", [recipient, ethers.utils.parseEther(amount)]);
+  }
 
   const response = await circleUserSdk.createUserToken({
     userId: userId,
