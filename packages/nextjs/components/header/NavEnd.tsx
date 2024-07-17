@@ -23,7 +23,6 @@ export const NavEnd = () => {
 
   return (
     <>
-      {/* {isLoading ? <Loader /> : */}
       <div>
         <div className="navbar-end flex-grow mr-4">
           {!user ? (
@@ -51,7 +50,6 @@ export const NavEnd = () => {
         <RegisterDialog />
         <ProfileDialog />
       </div>
-      {/* </div>} */}
     </>
   );
 };

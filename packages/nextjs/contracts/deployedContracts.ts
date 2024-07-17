@@ -5,9 +5,9 @@
 import { GenericContractsDeclaration } from "~~/utils/scaffold-eth/contract";
 
 const deployedContracts = {
-  31337: {
+  80002: {
     SuperMintable: {
-      address: "0x5FbDB2315678afecb367f032d93F642f64180aa3",
+      address: "0xac72293B5b59E4e6D44A4260DE72922fE9110131",
       abi: [
         {
           inputs: [
@@ -319,7 +319,7 @@ const deployedContracts = {
   },
   11155111: {
     SuperMintable: {
-      address: "0x89a3b78C0252E12a2a831639337e853AB5D04E3a",
+      address: "0xF9749e857C16686B8E7C66Dcc985044660Ca0056",
       abi: [
         {
           inputs: [

@@ -1,44 +1,122 @@
 "use client";
 
 import { useState } from "react";
-import { useAccount } from "@alchemy/aa-alchemy/react";
+import { useAuth } from "./auth/AuthProvider";
+import { W3SSdk } from "@circle-fin/w3s-pw-web-sdk";
 import type { NextPage } from "next";
-import { formatEther, parseEther } from "viem";
-import { Address } from "viem";
+import { formatEther } from "viem";
 import { AddressInput, IntegerInput } from "~~/components/scaffold-eth";
-import { useScaffoldReadContract, useScaffoldWriteContract } from "~~/hooks/scaffold-eth";
-
-declare global {
-  interface HTMLDialogElement extends HTMLElement {
-    showModal(): void;
-  }
-}
+import { useScaffoldReadContract } from "~~/hooks/scaffold-eth";
 
 const Home: NextPage = () => {
-  const { account } = useAccount({ type: "MultiOwnerModularAccount" });
+  const { user } = useAuth();
   const [recipient, setRecipient] = useState("");
   const [amount, setAmount] = useState<string | bigint>("");
 
-  const { data: balance, refetch } = useScaffoldReadContract({
+  const { data: balance } = useScaffoldReadContract({
     contractName: "SuperMintable",
     functionName: "balanceOf",
-    args: [account?.address],
+    args: [user?.walletAddress],
   });
 
-  const { writeContractAsync } = useScaffoldWriteContract("SuperMintable");
-
   async function mint() {
-    writeContractAsync({
+    const sdk = new W3SSdk();
+
+    const executeMethod = (challengeId: any) => {
+      return new Promise((resolve, reject) => {
+        sdk.execute(challengeId!, (error: any, result: any) => {
+          if (error) {
+            reject(error);
+          } else if (result) {
+            console.log("Mint tx sent!");
+            resolve(result);
+          }
+        });
+      });
+    };
+
+    const data = {
+      userId: user?.userId,
+      walletId: user?.walletId,
+      walletAddress: user?.walletAddress,
       functionName: "mint",
-      args: [account?.address, parseEther("100")],
-    }).then(() => refetch());
+    };
+
+    const response = await fetch("/api/tx/writeContract/", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(data),
+    });
+
+    const data2 = await response.json();
+    const userToken = data2.userToken;
+    const encryptionKey = data2.encryptionKey;
+    const challengeId = data2.challengeId;
+
+    try {
+      sdk.setAppSettings({ appId: process.env.NEXT_PUBLIC_APP_ID! });
+      sdk.setAuthentication({
+        userToken: userToken,
+        encryptionKey: encryptionKey,
+      });
+
+      // Wait for the successful completion of executeMethod
+      await executeMethod(challengeId!);
+    } catch (err) {
+      // If any error, It will be caught here.
+      console.log(err);
+    }
   }
 
   async function transfer() {
-    writeContractAsync({
-      functionName: "transfer",
-      args: [recipient as Address, BigInt(amount)],
-    }).then(() => refetch());
+    const sdk = new W3SSdk();
+
+    const executeMethod = (challengeId: any) => {
+      return new Promise((resolve, reject) => {
+        sdk.execute(challengeId!, (error: any, result: any) => {
+          if (error) {
+            reject(error);
+          } else if (result) {
+            console.log("Transfer tx sent!");
+            resolve(result);
+          }
+        });
+      });
+    };
+
+    const data = {
+      userId: user?.userId,
+      walletId: user?.walletId,
+      walletAddress: user?.walletAddress,
+      methodName: "transfer",
+      recipient: recipient,
+      amount: amount,
+    };
+
+    const response = await fetch("/api/tx/writeContract/", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(data),
+    });
+
+    const data2 = await response.json();
+    const userToken = data2.userToken;
+    const encryptionKey = data2.encryptionKey;
+    const challengeId = data2.challengeId;
+
+    try {
+      sdk.setAppSettings({ appId: process.env.NEXT_PUBLIC_APP_ID! });
+      sdk.setAuthentication({
+        userToken: userToken,
+        encryptionKey: encryptionKey,
+      });
+
+      // Wait for the successful completion of executeMethod
+      await executeMethod(challengeId!);
+    } catch (err) {
+      // If any error, It will be caught here.
+      console.log(err);
+    }
   }
 
   return (

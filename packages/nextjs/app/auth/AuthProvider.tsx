@@ -5,26 +5,26 @@ import userbase from "userbase-js";
 
 interface User {
   username?: string | undefined;
-  walletAddress?: string;
-  userId?: string;
-  walletId?: string;
+  walletAddress?: string | undefined;
+  walletId?: string | undefined;
+  userId?: string | undefined;
 }
 
 interface AuthContextType {
   user: User | null;
   login: (username: string, password: string) => void;
-  register: (username: string, password: string, walletAddress: string, userId: string) => void;
+  register: (username: string, password: string, walletAddress: string, walletId: string, userId: string) => void;
   logout: () => void;
 }
 
 export const AuthContext = createContext<AuthContextType>({
   user: null,
   // eslint-disable-next-line
-    login: () => { },
+  login: () => { },
   // eslint-disable-next-line
-    logout: () => { },
+  logout: () => { },
   // eslint-disable-next-line
-    register: () => { }
+  register: () => { }
 });
 
 export function useAuth(): AuthContextType {
@@ -52,6 +52,7 @@ export const AuthProvider = ({ children }: any) => {
           setUser({
             username: user.username,
             walletAddress: user.profile?.walletAddress,
+            walletId: user.profile?.walletId,
             userId: user.profile?.userId,
           });
         } else {
@@ -64,16 +65,25 @@ export const AuthProvider = ({ children }: any) => {
       });
   }, []);
 
-  const register = async (username: string, password: string, walletAddress: string, walletId: string) => {
+  const register = async (
+    username: string,
+    password: string,
+    walletAddress: string,
+    walletId: string,
+    userId: string,
+  ) => {
     const profile = {
       walletAddress: walletAddress,
       walletId: walletId,
+      userId: userId,
     };
     try {
       const user = await userbase.signUp({ username, password, profile });
       setUser({
         username: user.username,
         walletAddress: walletAddress,
+        walletId: walletId,
+        userId: userId,
       });
       // setUser(user);
       console.log("Registration success success", user.username);
@@ -91,6 +101,7 @@ export const AuthProvider = ({ children }: any) => {
       setUser({
         username: user.username,
         walletAddress: user.profile?.walletAddress,
+        walletId: user.profile?.walletId,
         userId: user.profile?.userId,
       });
       // setUser(user);
