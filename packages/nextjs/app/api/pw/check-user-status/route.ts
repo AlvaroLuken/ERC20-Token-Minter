@@ -4,9 +4,6 @@ export async function POST(request: NextRequest) {
   const body = await request.json();
   const { userToken } = body;
 
-  console.log("HERE");
-  console.log("user token " + userToken);
-
   const url = "https://api.circle.com/v1/w3s/wallets";
   const options = {
     method: "GET",
@@ -20,10 +17,6 @@ export async function POST(request: NextRequest) {
   const res = await fetch(url, options);
   const body1 = await res.json();
   const wallet = body1.data.wallets[0];
-
-  console.log(body1);
-
-  console.log(wallet);
 
   const data = {
     wallet,

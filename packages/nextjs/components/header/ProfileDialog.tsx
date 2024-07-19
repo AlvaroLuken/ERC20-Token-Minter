@@ -9,16 +9,19 @@ export const ProfileDialog = () => {
 
   async function handleLogout() {
     logout();
-    const closeModalButton = document.getElementById("close-the-modal");
-    closeModalButton?.click();
+    closeModal3();
   }
+
+  const closeModal3 = () => {
+    (document.getElementById(PROFILE_DIALOG_ID) as HTMLDialogElement).close();
+  };
 
   return (
     <dialog id={PROFILE_DIALOG_ID} className="modal">
       <div className="modal-box flex justify-center self-center z-10 mt-12">
         <div className="p-12 mx-auto rounded-2xl w-100 ">
           <div className="mb-4">
-            <h3 className="font-semibold text-2xl ">Your Profile</h3>
+            <h3 className="flex justify-center font-semibold text-2xl ">Your Profile</h3>
           </div>
           <p className="">
             <b>Username</b>: {user?.username}
@@ -29,11 +32,12 @@ export const ProfileDialog = () => {
           <p className="">
             <b>Wallet Id</b>: {user?.walletId}
           </p>
-          <div className="btn btn-primary ml-2" onClick={handleLogout}>
-            Log out
+          <div className="flex items-center btn btn-primary ml-2" onClick={handleLogout}>
+            Log Out
           </div>
-          <div className="pt-5 text-center text-xs">
-            <span>Developed in-house by Circle.</span>
+          <div className="pt-5 text-center text-xs flex items-center justify-center space-x-2">
+            <span>Developed by Circle.</span>
+            <img src="/USDC_Icon.png" alt="Circle Logo" className="h-4 w-4" />
           </div>
         </div>
       </div>

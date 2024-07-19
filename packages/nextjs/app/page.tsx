@@ -2,38 +2,52 @@
 
 import { useState } from "react";
 import { useAuth } from "./auth/AuthProvider";
+import NftMinter from "./nft-minter/page";
 import { W3SSdk } from "@circle-fin/w3s-pw-web-sdk";
 import type { NextPage } from "next";
 import { formatEther } from "viem";
 import { AddressInput, IntegerInput } from "~~/components/scaffold-eth";
 import { useScaffoldReadContract } from "~~/hooks/scaffold-eth";
+import { notification } from "~~/utils/scaffold-eth";
 
 const Home: NextPage = () => {
   const { user } = useAuth();
   const [recipient, setRecipient] = useState("");
   const [amount, setAmount] = useState<string | bigint>("");
+  const [, setIsMining] = useState(false);
 
-  const { data: balance } = useScaffoldReadContract({
+  const { data: balance, refetch } = useScaffoldReadContract({
     contractName: "SuperMintable",
     functionName: "balanceOf",
     args: [user?.walletAddress],
   });
 
   async function mint() {
+    if (!user) {
+      notification.error("Please sign in to make a transaction!");
+      return;
+    }
+    setIsMining(true);
     const sdk = new W3SSdk();
 
     const executeMethod = (challengeId: any) => {
+      notification.remove("");
       return new Promise((resolve, reject) => {
         sdk.execute(challengeId!, (error: any, result: any) => {
           if (error) {
             reject(error);
           } else if (result) {
-            console.log("Mint tx sent!");
+            console.log(result);
             resolve(result);
+            console.log(result);
           }
         });
       });
     };
+
+    notification.info("Awaiting your approval...", {
+      duration: 1500,
+    });
 
     const data = {
       userId: user?.userId,
@@ -62,13 +76,23 @@ const Home: NextPage = () => {
 
       // Wait for the successful completion of executeMethod
       await executeMethod(challengeId!);
+
+      notification.success("Sent tx!", {
+        duration: 3500,
+      });
     } catch (err) {
       // If any error, It will be caught here.
       console.log(err);
     }
+    notification.remove("");
   }
 
   async function transfer() {
+    if (!user) {
+      notification.error("Please sign in to make a transaction!");
+      return;
+    }
+
     const sdk = new W3SSdk();
 
     const executeMethod = (challengeId: any) => {
@@ -77,8 +101,8 @@ const Home: NextPage = () => {
           if (error) {
             reject(error);
           } else if (result) {
-            console.log("Transfer tx sent!");
             resolve(result);
+            refetch();
           }
         });
       });
@@ -88,7 +112,7 @@ const Home: NextPage = () => {
       userId: user?.userId,
       walletId: user?.walletId,
       walletAddress: user?.walletAddress,
-      methodName: "transfer",
+      functionName: "transfer",
       recipient: recipient,
       amount: amount,
     };
@@ -103,6 +127,7 @@ const Home: NextPage = () => {
     const userToken = data2.userToken;
     const encryptionKey = data2.encryptionKey;
     const challengeId = data2.challengeId;
+    const txId = data2.txId;
 
     try {
       sdk.setAppSettings({ appId: process.env.NEXT_PUBLIC_APP_ID! });
@@ -113,6 +138,25 @@ const Home: NextPage = () => {
 
       // Wait for the successful completion of executeMethod
       await executeMethod(challengeId!);
+
+      notification.success("Sent tx!", {
+        duration: 3500,
+      });
+
+      // check for tx here??
+      const data = {
+        userId: user?.userId,
+        txId: txId,
+      };
+
+      const response = await fetch("/api/tx/get-tx-by-id/", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(data),
+      });
+
+      const data2 = await response.json();
+      console.log(data2);
     } catch (err) {
       // If any error, It will be caught here.
       console.log(err);
@@ -120,35 +164,46 @@ const Home: NextPage = () => {
   }
 
   return (
-    <div className="flex items-center flex-col flex-grow pt-10">
-      <div className="card bg-base-100 w-96 shadow-xl">
-        <div className="stat">
-          <div className="stat-title">Your Tokens</div>
-          <div className="stat-value">{formatEther(balance || 0n)}</div>
-          <div className="stat-actions">
-            <button className="btn btn-sm" onClick={mint}>
-              Mint 100
-            </button>
+    <div className="container mx-auto p-4 lg:p-2">
+      <div className="flex flex-col lg:flex-row items-center justify-center m-4 lg:m-10 gap-4 lg:gap-10">
+        <div className="flex flex-col gap-4">
+          <div className="card bg-base-100 shadow-xl">
+            <div className="card-body">
+              <div className="card-title">Your Tokens</div>
+              <div className="stat">
+                <div className="stat-value">{formatEther(balance || 0n)}</div>
+              </div>
+              <div className="card-actions flex justify-end">
+                <button className="btn btn-primary" onClick={mint}>
+                  Mint 100
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <div className="card bg-base-100 shadow-xl w-full max-w-md">
+            <div className="card-body">
+              <h2 className="card-title">Transfer Tokens</h2>
+              <label>
+                <div className="w-full max-w-xs overflow-hidden">
+                  <AddressInput value={recipient} onChange={val => setRecipient(val)} />
+                </div>
+              </label>
+              <label>
+                Amount:
+                <IntegerInput disableMultiplyBy1e18 value={amount} onChange={val => setAmount(val)} />
+              </label>
+              <div className="card-actions justify-end">
+                <button className="btn btn-primary mt-2" onClick={transfer}>
+                  Transfer
+                </button>
+              </div>
+            </div>
           </div>
         </div>
-      </div>
-      <div className="card bg-base-100 w-96 shadow-xl mt-12">
-        <div className="card-body">
-          <h2 className="card-title">Transfer Tokens</h2>
 
-          <label>
-            <AddressInput value={recipient} onChange={val => setRecipient(val)} />
-          </label>
-          <label>
-            Amount:
-            <IntegerInput value={amount} onChange={val => setAmount(val)} />
-          </label>
-
-          <div className="card-actions justify-end">
-            <button className="btn btn-primary" onClick={transfer}>
-              Transfer
-            </button>
-          </div>
+        <div className="card bg-base-100 shadow-xl w-full lg:max-w-sm">
+          <NftMinter />
         </div>
       </div>
     </div>

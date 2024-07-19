@@ -1,9 +1,10 @@
 "use client";
 
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { W3SSdk } from "@circle-fin/w3s-pw-web-sdk";
 import { v4 as uuidv4 } from "uuid";
 import { useAuth } from "~~/app/auth/AuthProvider";
+import Loader from "~~/utils/Loader";
 
 export const REGISTER_DIALOG_ID = "register-dialog";
 
@@ -11,6 +12,12 @@ export const RegisterDialog = () => {
   const { register } = useAuth();
   const [email, setEmail] = useState<string>("");
   const [password, setPassword] = useState<string>("");
+  const [isLoading, setIsLoading] = useState(false);
+  const registerButtonRef = useRef<HTMLButtonElement>(null);
+
+  const closeModal1 = () => {
+    (document.getElementById(REGISTER_DIALOG_ID) as HTMLDialogElement).close();
+  };
 
   const handleEmailChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     setEmail(event.target.value);
@@ -21,15 +28,22 @@ export const RegisterDialog = () => {
     setPassword(event.target.value);
   };
 
+  const handleKeyDown = (e: any) => {
+    if (e.key === "Enter") {
+      e.preventDefault(); // Prevent form from submitting if inside a form
+      registerButtonRef.current?.click();
+    }
+  };
+
   async function handleRegister() {
+    setIsLoading(true);
     const delay = (ms: any) => {
       return new Promise(resolve => setTimeout(resolve, ms));
     };
+    setTimeout(closeModal1, 1800);
     console.log("Registering...");
 
     const userId = uuidv4();
-
-    console.log(userId);
 
     const data1 = { userId: userId };
 
@@ -39,12 +53,12 @@ export const RegisterDialog = () => {
       body: JSON.stringify(data1),
     });
 
+    setIsLoading(false);
+
     const data2 = await initUserWalletResponse.json();
     const userToken = data2.userToken;
     const encryptionKey = data2.encryptionKey;
     const challengeId = data2.challengeId;
-
-    /// ENTER THE WEB3 SDK ///
 
     const sdk = new W3SSdk();
 
@@ -73,7 +87,7 @@ export const RegisterDialog = () => {
       // Wait for the successful completion of executeMethod
       await executeMethod(challengeId!);
 
-      await delay(2000);
+      await delay(1700);
 
       const data = { userToken: userToken };
 
@@ -105,42 +119,45 @@ export const RegisterDialog = () => {
           </div>
           <div className="space-y-5">
             <div className="space-y-2">
-              <label className="text-sm font-medium tracking-wide">Email</label>
+              <label className="text-sm font-medium tracking-wide">Username</label>
               <input
+                onKeyDown={handleKeyDown}
                 onChange={handleEmailChange}
                 className=" w-full text-base px-4 py-2 border  border-gray-300 rounded-lg focus:outline-none focus:border-green-400"
                 type=""
-                placeholder="mail@gmail.com"
+                placeholder="pikachu232"
               />
             </div>
             <div className="space-y-2">
               <label className="mb-5 text-sm font-medium tracking-wide">Password</label>
               <input
+                onKeyDown={handleKeyDown}
                 onChange={handlePasswordChange}
                 className="w-full content-center text-base px-4 py-2 border  border-gray-300 rounded-lg focus:outline-none focus:border-green-400"
-                type=""
+                type="password"
                 placeholder="Enter your password"
               />
             </div>
             <div>
               <button
                 onClick={handleRegister}
+                ref={registerButtonRef}
                 type="submit"
                 className="w-full flex justify-center bg-green-400  hover:bg-green-500 p-3  rounded-full tracking-wide font-semibold  shadow-lg cursor-pointer transition ease-in duration-500"
               >
-                Register
+                {isLoading ? <Loader /> : "Register"}
               </button>
             </div>
           </div>
-          <div className="pt-5 text-center text-xs">
-            <span>Developed in-house by Circle.</span>
+          <div className="pt-5 text-center text-xs flex items-center justify-center space-x-2">
+            <span>Developed by Circle.</span>
+            <img src="/USDC_Icon.png" alt="Circle Logo" className="h-4 w-4" />
           </div>
         </div>
       </div>
-      <form method="dialog" className="modal-backdrop">
+      <div className="modal-backdrop">
         <button id="close-the-modal">close</button>
-      </form>
-      {/* </form> */}
+      </div>
     </dialog>
   );
 };

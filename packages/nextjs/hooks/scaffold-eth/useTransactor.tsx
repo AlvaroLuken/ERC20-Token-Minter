@@ -1,10 +1,13 @@
-import { SmartAccountClient } from "@alchemy/aa-core";
-import { Hash, SendTransactionParameters } from "viem";
+import { getPublicClient } from "@wagmi/core";
+import { Hash, SendTransactionParameters, WalletClient } from "viem";
+import { Config, useWalletClient } from "wagmi";
+import { SendTransactionMutate } from "wagmi/query";
+import { wagmiConfig } from "~~/services/web3/wagmiConfig";
 import { getBlockExplorerTxLink, getParsedError, notification } from "~~/utils/scaffold-eth";
 import { TransactorFuncOptions } from "~~/utils/scaffold-eth/contract";
 
 type TransactionFunc = (
-  tx: (() => Promise<Hash>) | SendTransactionParameters,
+  tx: (() => Promise<Hash>) | Parameters<SendTransactionMutate<Config, undefined>>[0],
   options?: TransactorFuncOptions,
 ) => Promise<Hash | undefined>;
 
@@ -29,9 +32,15 @@ const TxnNotification = ({ message, blockExplorerLink }: { message: string; bloc
  * @param _walletClient - Optional wallet client to use. If not provided, will use the one from useWalletClient.
  * @returns function that takes in transaction function as callback, shows UI feedback for transaction and returns a promise of the transaction hash
  */
-export const useTransactor = ({ client }: { client?: SmartAccountClient }): TransactionFunc => {
+export const useTransactor = (_walletClient?: WalletClient): TransactionFunc => {
+  let walletClient = _walletClient;
+  const { data } = useWalletClient();
+  if (walletClient === undefined && data) {
+    walletClient = data;
+  }
+
   const result: TransactionFunc = async (tx, options) => {
-    if (!client) {
+    if (!walletClient) {
       notification.error("Cannot access account");
       console.error("⚡️ ~ file: useTransactor.tsx ~ error");
       return;
@@ -40,13 +49,17 @@ export const useTransactor = ({ client }: { client?: SmartAccountClient }): Tran
     let notificationId = null;
     let transactionHash: Hash | undefined = undefined;
     try {
-      const network = await client.getChainId();
+      const network = await walletClient.getChainId();
+      // Get full transaction from public client
+      const publicClient = getPublicClient(wagmiConfig);
 
-      notificationId = notification.loading(<TxnNotification message="Sending User Operation" />);
+      notificationId = notification.loading(<TxnNotification message="Awaiting for user confirmation" />);
       if (typeof tx === "function") {
         // Tx is already prepared by the caller
         const result = await tx();
         transactionHash = result;
+      } else if (tx != null) {
+        transactionHash = await walletClient.sendTransaction(tx as SendTransactionParameters);
       } else {
         throw new Error("Incorrect transaction passed to transactor");
       }
@@ -58,7 +71,7 @@ export const useTransactor = ({ client }: { client?: SmartAccountClient }): Tran
         <TxnNotification message="Waiting for transaction to complete." blockExplorerLink={blockExplorerTxURL} />,
       );
 
-      const transactionReceipt = await client.waitForTransactionReceipt({
+      const transactionReceipt = await publicClient.waitForTransactionReceipt({
         hash: transactionHash,
         confirmations: options?.blockConfirmations,
       });

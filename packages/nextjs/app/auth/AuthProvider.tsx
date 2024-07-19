@@ -56,7 +56,7 @@ export const AuthProvider = ({ children }: any) => {
             userId: user.profile?.userId,
           });
         } else {
-          console.log("Init success. No user loged in.");
+          console.log("Init success. No user logged in.");
         }
       })
       .catch(error => {
@@ -85,7 +85,6 @@ export const AuthProvider = ({ children }: any) => {
         walletId: walletId,
         userId: userId,
       });
-      // setUser(user);
       console.log("Registration success success", user.username);
     } catch (error) {
       console.error(error);
@@ -96,15 +95,12 @@ export const AuthProvider = ({ children }: any) => {
   const login = async (username: string, password: string) => {
     try {
       const user = await userbase.signIn({ username, password });
-      // get user
-      console.log(user);
       setUser({
         username: user.username,
         walletAddress: user.profile?.walletAddress,
         walletId: user.profile?.walletId,
         userId: user.profile?.userId,
       });
-      // setUser(user);
       console.log("Log in success", user.username);
     } catch (error) {
       console.error(error);

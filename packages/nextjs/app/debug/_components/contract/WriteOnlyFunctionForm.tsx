@@ -15,7 +15,6 @@ import {
   transformAbiFunction,
 } from "~~/app/debug/_components/contract";
 import { IntegerInput } from "~~/components/scaffold-eth";
-import { useTransactor } from "~~/hooks/scaffold-eth";
 
 type WriteOnlyFunctionFormProps = {
   abi: Abi;
@@ -52,7 +51,7 @@ export const WriteOnlyFunctionForm = ({
   });
   const [form, setForm] = useState<Record<string, any>>(() => getInitialFormState(abiFunction));
   const [txValue, setTxValue] = useState<string | bigint>("");
-  const writeTxn = useTransactor({ client });
+  // const writeTxn = useTransactor({ client });
   const writeDisabled = !client?.account;
 
   const { data: result } = useWriteContract();
@@ -75,7 +74,7 @@ export const WriteOnlyFunctionForm = ({
           });
           return client.waitForUserOperationTransaction(uo);
         };
-        await writeTxn(makeWriteWithParams);
+        console.log(makeWriteWithParams);
         onChange();
       } catch (e: any) {
         console.error("⚡️ ~ file: WriteOnlyFunctionForm.tsx:handleWrite ~ error", e);

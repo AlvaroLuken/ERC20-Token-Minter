@@ -1,8 +1,11 @@
+"use client";
+
 import { useState } from "react";
-import { useSendUserOperation, useSmartAccountClient } from "@alchemy/aa-alchemy/react";
 import { Abi, ExtractAbiFunctionNames } from "abitype";
-import { Hex, encodeFunctionData } from "viem";
-import { useDeployedContractInfo, useTransactor } from "~~/hooks/scaffold-eth";
+import { encodeFunctionData } from "viem";
+import { UseWriteContractParameters } from "wagmi";
+import { useAuth } from "~~/app/auth/AuthProvider";
+import { useDeployedContractInfo } from "~~/hooks/scaffold-eth";
 import { notification } from "~~/utils/scaffold-eth";
 import {
   ContractAbi,
@@ -11,31 +14,20 @@ import {
   ScaffoldWriteContractVariables,
 } from "~~/utils/scaffold-eth/contract";
 
-const policyId = process.env.NEXT_PUBLIC_ALCHEMY_GAS_MANAGER_POLICY_ID;
+// EDIT THIS FILE YO!!!!!!!!!
 
 /**
  * this hook automatically loads (by name) the contract ABI and address from
  * the contracts present in deployedContracts.ts & externalContracts.ts
  * @param contractName - name of the contract to be written to
  */
-export const useScaffoldWriteContract = <TContractName extends ContractName>(contractName: TContractName) => {
-  if (!policyId) {
-    throw new Error("gas policy not set!");
-  }
-
-  const { client } = useSmartAccountClient({
-    type: "MultiOwnerModularAccount",
-    gasManagerConfig: {
-      policyId,
-    },
-    opts: {
-      txMaxRetries: 20,
-    },
-  });
-  const { sendUserOperationAsync, sendUserOperation } = useSendUserOperation({ client });
-
-  const writeTx = useTransactor({ client });
+export const useScaffoldWriteContract = <TContractName extends ContractName>(
+  contractName: TContractName,
+  writeContractParams?: UseWriteContractParameters,
+) => {
+  const { user } = useAuth();
   const [isMining, setIsMining] = useState(false);
+  console.log(writeContractParams);
 
   const { data: deployedContractData } = useDeployedContractInfo(contractName);
 
@@ -45,8 +37,11 @@ export const useScaffoldWriteContract = <TContractName extends ContractName>(con
     variables: ScaffoldWriteContractVariables<TContractName, TFunctionName>,
     options?: ScaffoldWriteContractOptions,
   ) => {
-    if (!client) {
-      notification.error("SmartAccountClient not defined!");
+    console.log("IN THE PLAYGROUND!");
+    console.log(variables);
+
+    if (!user) {
+      notification.error("You must sign in to make a transaction.");
       return;
     }
 
@@ -56,28 +51,13 @@ export const useScaffoldWriteContract = <TContractName extends ContractName>(con
     }
 
     try {
+      console.log("HERE?");
       setIsMining(true);
       const { blockConfirmations, onBlockConfirmation, ...mutateOptions } = options || {};
 
-      const makeWriteWithParams: () => Promise<Hex> = async () => {
-        const data = encodeFunctionData({
-          abi: deployedContractData.abi as Abi,
-          functionName: variables.functionName as string,
-          args: variables.args as unknown[],
-        });
-        const uo = await sendUserOperationAsync({
-          uo: {
-            target: deployedContractData.address,
-            value: BigInt(variables.value || 0),
-            data,
-          },
-          ...mutateOptions,
-        });
-        return client.waitForUserOperationTransaction(uo);
-      };
-      const writeTxResult = await writeTx(makeWriteWithParams, { blockConfirmations, onBlockConfirmation });
-
-      return writeTxResult;
+      console.log(mutateOptions);
+      console.log(blockConfirmations);
+      console.log(onBlockConfirmation);
     } catch (e: any) {
       throw e;
     } finally {
@@ -94,6 +74,7 @@ export const useScaffoldWriteContract = <TContractName extends ContractName>(con
   ) => {
     if (!deployedContractData) {
       notification.error("Target Contract is not deployed, did you forget to run `yarn deploy`?");
+      console.log(options);
       return;
     }
 
@@ -102,14 +83,8 @@ export const useScaffoldWriteContract = <TContractName extends ContractName>(con
       functionName: variables.functionName as string,
       args: variables.args as unknown[],
     });
-    sendUserOperation({
-      uo: {
-        target: deployedContractData.address,
-        value: BigInt(variables.value || 0),
-        data,
-      },
-      ...options,
-    });
+
+    console.log(data);
   };
 
   return {
