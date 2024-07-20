@@ -31,16 +31,14 @@ export const TransferNftDialog = (tokenId: any, getNfts: any) => {
           if (error) {
             reject(error);
           } else if (result) {
-            console.log(result);
             resolve(result);
-            console.log(result);
           }
         });
       });
     };
 
     notification.info("Awaiting your approval...", {
-      duration: 1500,
+      duration: 2000,
     });
 
     const data = {

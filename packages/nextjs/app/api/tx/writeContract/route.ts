@@ -77,7 +77,6 @@ export async function POST(request: NextRequest) {
       userToken: userToken,
       encryptionKey: encryptionKey,
       challengeId: challengeId,
-      txId: "111",
     };
 
     return NextResponse.json(data);

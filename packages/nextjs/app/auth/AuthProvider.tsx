@@ -48,7 +48,6 @@ export const AuthProvider = ({ children }: any) => {
         const user = session.user;
         if (user) {
           // there is a valid active session
-          console.log(user);
           setUser({
             username: user.username,
             walletAddress: user.profile?.walletAddress,
@@ -56,7 +55,7 @@ export const AuthProvider = ({ children }: any) => {
             userId: user.profile?.userId,
           });
         } else {
-          console.log("Init success. No user logged in.");
+          console.log("Db init success. No user logged in.");
         }
       })
       .catch(error => {

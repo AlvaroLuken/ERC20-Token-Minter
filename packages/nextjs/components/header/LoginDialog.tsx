@@ -15,7 +15,6 @@ export const LoginDialog = () => {
 
   const handleEmailChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     setEmail(event.target.value);
-    console.log(email);
   };
 
   const handlePasswordChange = (event: React.ChangeEvent<HTMLInputElement>) => {

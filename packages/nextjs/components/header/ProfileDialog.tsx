@@ -23,16 +23,21 @@ export const ProfileDialog = () => {
           <div className="mb-4">
             <h3 className="flex justify-center font-semibold text-2xl ">Your Profile</h3>
           </div>
-          <p className="">
+          <p>
             <b>Username</b>: {user?.username}
           </p>
-          <p className="">
+          <p>
             <b>Wallet Address</b>: {user?.walletAddress}
           </p>
-          <p className="">
-            <b>Wallet Id</b>: {user?.walletId}
-          </p>
-          <div className="flex items-center btn btn-primary ml-2" onClick={handleLogout}>
+          <a
+            href={`https://amoy.polygonscan.com/address/${user?.walletAddress}#nfttransfers`}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-blue-500"
+          >
+            <b>View Wallet on Explorer</b>
+          </a>
+          <div className="flex items-center btn btn-primary ml-2 mt-6" onClick={handleLogout}>
             Log Out
           </div>
           <div className="pt-5 text-center text-xs flex items-center justify-center space-x-2">

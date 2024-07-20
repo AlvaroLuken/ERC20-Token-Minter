@@ -31,9 +31,6 @@ export async function POST(request: NextRequest) {
 
   const res = await fetch(url, options);
   const body1 = await res.json();
-
-  console.log(body1.data["nfts"]);
-
   const nfts = body1.data["nfts"];
 
   const data = {

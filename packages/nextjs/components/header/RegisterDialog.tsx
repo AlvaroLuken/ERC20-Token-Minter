@@ -21,7 +21,6 @@ export const RegisterDialog = () => {
 
   const handleEmailChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     setEmail(event.target.value);
-    console.log(email);
   };
 
   const handlePasswordChange = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -86,9 +85,7 @@ export const RegisterDialog = () => {
 
       // Wait for the successful completion of executeMethod
       await executeMethod(challengeId!);
-
       await delay(1700);
-
       const data = { userToken: userToken };
 
       // After successful completion of sdk.execute() make another API call

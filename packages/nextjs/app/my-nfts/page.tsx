@@ -46,8 +46,6 @@ const MyNfts: NextPage = () => {
   }, [user]);
 
   async function handleTransferNft(tokenId: any) {
-    console.log("CHAT0");
-    console.log(tokenId);
     setTokenId(tokenId);
     openModal4();
   }
@@ -65,13 +63,14 @@ const MyNfts: NextPage = () => {
     });
 
     const data2 = await response.json();
-    console.log(data2.nfts);
     setNfts(data2.nfts);
   }
 
   return (
     <div className="nft-gallery flex items-center justify-center m-10">
-      {isLoading ? (
+      {!user ? (
+        "Please sign in to view your NFTs."
+      ) : isLoading ? (
         <Loader />
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">

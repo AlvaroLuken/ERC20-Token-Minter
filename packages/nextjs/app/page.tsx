@@ -37,16 +37,14 @@ const Home: NextPage = () => {
           if (error) {
             reject(error);
           } else if (result) {
-            console.log(result);
             resolve(result);
-            console.log(result);
           }
         });
       });
     };
 
     notification.info("Awaiting your approval...", {
-      duration: 1500,
+      duration: 2000,
     });
 
     const data = {
@@ -127,7 +125,6 @@ const Home: NextPage = () => {
     const userToken = data2.userToken;
     const encryptionKey = data2.encryptionKey;
     const challengeId = data2.challengeId;
-    const txId = data2.txId;
 
     try {
       sdk.setAppSettings({ appId: process.env.NEXT_PUBLIC_APP_ID! });
@@ -143,20 +140,7 @@ const Home: NextPage = () => {
         duration: 3500,
       });
 
-      // check for tx here??
-      const data = {
-        userId: user?.userId,
-        txId: txId,
-      };
-
-      const response = await fetch("/api/tx/get-tx-by-id/", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(data),
-      });
-
-      const data2 = await response.json();
-      console.log(data2);
+      // CHECK FOR TX STATUS HERE
     } catch (err) {
       // If any error, It will be caught here.
       console.log(err);
