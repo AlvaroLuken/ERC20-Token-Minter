@@ -9,9 +9,9 @@ const baseUrl = process.env.VERCEL_URL
   : `http://localhost:${process.env.PORT || 3000}`;
 const imageUrl = `${baseUrl}/circle_icon.png`;
 
-const title = "Scaffold-AA App";
-const titleTemplate = "%s | Scaffold-ETH AA";
-const description = "Built with 🏗 Scaffold-ETH 2";
+const title = "Circle Token Hub";
+const titleTemplate = "Circle Programmable Wallets Token Hub";
+const description = "Built with Circle Programmable Wallets";
 
 export const metadata: Metadata = {
   metadataBase: new URL(baseUrl),

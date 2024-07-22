@@ -74,23 +74,25 @@ const MyNfts: NextPage = () => {
         <Loader />
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-          {nfts.map(nft => (
-            <div key={nft.nftTokenId} className="card bg-base-100 w-96 shadow-xl">
-              <figure className="px-10 pt-10">
-                <img src={nft.metadata} alt={`NFT ${nft.nftTokenId}`} className="rounded-xl" />
-              </figure>
-              <div className="card-body items-center text-center">
-                <h2 className="card-title">
-                  {nft.token.name} {nft.nftTokenId}
-                </h2>
-                <div className="card-actions flex justify-end">
-                  <button className="btn btn-primary" onClick={() => handleTransferNft(nft.nftTokenId)}>
-                    Transfer NFT
-                  </button>
+          {nfts
+            .filter(nft => parseInt(nft.amount, 10) > 0)
+            .map(nft => (
+              <div key={nft.nftTokenId} className="card bg-base-100 w-96 shadow-xl">
+                <figure className="px-10 pt-10">
+                  <img src={nft.metadata} alt={`NFT ${nft.nftTokenId}`} className="rounded-xl" />
+                </figure>
+                <div className="card-body items-center text-center">
+                  <h2 className="card-title">
+                    {nft.token.name} {nft.nftTokenId}
+                  </h2>
+                  <div className="card-actions flex justify-end">
+                    <button className="btn btn-primary" onClick={() => handleTransferNft(nft.nftTokenId)}>
+                      Transfer NFT
+                    </button>
+                  </div>
                 </div>
               </div>
-            </div>
-          ))}
+            ))}
         </div>
       )}
       <TransferNftDialog tokenId={tokenId} getNfts={getNfts} />

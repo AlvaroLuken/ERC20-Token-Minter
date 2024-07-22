@@ -1,5 +1,5 @@
 {
-  "name": "ScaffoldETH App",
-  "description": "An app built with ScaffoldETH",
+  "name": "Circle Token Hub",
+  "description": "A token hub that let's you mint tokens using Circle Programmable Wallets",
   "iconPath": "circle_icon.png"
 }
