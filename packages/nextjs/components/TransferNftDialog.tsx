@@ -29,6 +29,7 @@ export const TransferNftDialog = (tokenId: any, getNfts: any) => {
       return new Promise((resolve, reject) => {
         sdk.execute(challengeId!, (error: any, result: any) => {
           if (error) {
+            notification.error(error);
             reject(error);
           } else if (result) {
             resolve(result);

@@ -5,6 +5,7 @@ import { W3SSdk } from "@circle-fin/w3s-pw-web-sdk";
 import { v4 as uuidv4 } from "uuid";
 import { useAuth } from "~~/app/auth/AuthProvider";
 import Loader from "~~/utils/Loader";
+import { notification } from "~~/utils/scaffold-eth";
 
 export const REGISTER_DIALOG_ID = "register-dialog";
 
@@ -42,6 +43,20 @@ export const RegisterDialog = () => {
     setTimeout(closeModal1, 1800);
     console.log("Registering...");
 
+    if (email.length <= 6) {
+      closeModal1();
+      setIsLoading(false);
+      notification.error("Username is too short. Must be over 6 characters.");
+      return;
+    }
+
+    if (password.length <= 6) {
+      closeModal1();
+      setIsLoading(false);
+      notification.error("Password is too short. Must be over 6 characters.");
+      return;
+    }
+
     const userId = uuidv4();
 
     const data1 = { userId: userId };
@@ -65,6 +80,7 @@ export const RegisterDialog = () => {
       return new Promise((resolve, reject) => {
         sdk.execute(challengeId!, (error: any, result: any) => {
           if (error) {
+            notification.error(error);
             reject(error);
           } else if (result) {
             console.log("User registered!");

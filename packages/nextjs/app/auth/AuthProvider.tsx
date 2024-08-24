@@ -2,6 +2,7 @@
 
 import React, { createContext, useContext, useEffect, useState } from "react";
 import userbase from "userbase-js";
+import { notification } from "~~/utils/scaffold-eth";
 
 interface User {
   username?: string | undefined;
@@ -59,8 +60,9 @@ export const AuthProvider = ({ children }: any) => {
         }
       })
       .catch(error => {
-        console.error("Error initializing Userbase:", error);
         // Handle initialization error
+        console.error("Error initializing Userbase: ", error.message);
+        notification.error("Error initializing Userbase: ", error.message);
       });
   }, []);
 
@@ -85,9 +87,12 @@ export const AuthProvider = ({ children }: any) => {
         userId: userId,
       });
       console.log("Registration success success", user.username);
-    } catch (error) {
-      console.error(error);
+    } catch (error: any) {
       // handle the error
+      const message = error.message;
+      console.log("The message is: ", message.toString());
+      notification.error("ERROR: ", message);
+      console.error(error);
     }
   };
 
@@ -101,9 +106,10 @@ export const AuthProvider = ({ children }: any) => {
         userId: user.profile?.userId,
       });
       console.log("Log in success", user.username);
-    } catch (error) {
-      console.error(error);
+    } catch (error: any) {
       // handle the error
+      notification.error("Error initializing Userbase: ", error.message);
+      console.error(error);
     }
   };
 
@@ -112,9 +118,10 @@ export const AuthProvider = ({ children }: any) => {
       await userbase.signOut();
       setUser(null);
       console.log("User has been logged out.");
-    } catch (error) {
-      console.error(error);
+    } catch (error: any) {
       // handle the error
+      notification.error("Error initializing Userbase: ", error.message);
+      console.error(error);
     }
   };
 

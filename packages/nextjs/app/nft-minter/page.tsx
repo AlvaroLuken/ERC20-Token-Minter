@@ -19,6 +19,7 @@ const NftMinter: NextPage = () => {
       return new Promise((resolve, reject) => {
         sdk.execute(challengeId!, (error: any, result: any) => {
           if (error) {
+            notification.error(error);
             reject(error);
           } else if (result) {
             resolve(result);
@@ -65,6 +66,7 @@ const NftMinter: NextPage = () => {
       // CHECK FOR TX STATUS HERE
     } catch (err) {
       // If any error, It will be caught here.
+      notification.error(err as any);
       console.log(err);
     }
     notification.remove("");

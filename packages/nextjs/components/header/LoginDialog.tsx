@@ -3,6 +3,7 @@
 import { useRef, useState } from "react";
 import { useAuth } from "~~/app/auth/AuthProvider";
 import Loader from "~~/utils/Loader";
+import { notification } from "~~/utils/scaffold-eth";
 
 export const LOGIN_DIALOG_ID = "login-dialog";
 
@@ -35,6 +36,20 @@ export const LoginDialog = () => {
   async function handleLogin() {
     setIsLoading(true);
     setTimeout(closeModal2, 1800);
+
+    if (email.length <= 6) {
+      closeModal2();
+      setIsLoading(false);
+      notification.error("Error signing in. Username is too short.");
+      return;
+    }
+
+    if (password.length <= 6) {
+      closeModal2();
+      setIsLoading(false);
+      notification.error("Error signing in. Password is too short.");
+      return;
+    }
     login(email, password);
     // setIsLoading(false);
   }
